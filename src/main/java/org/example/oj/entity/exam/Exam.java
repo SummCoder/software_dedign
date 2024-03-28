@@ -1,9 +1,9 @@
-package org.example.reader.entity.exam;
+package org.example.oj.entity.exam;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.reader.entity.question.Question;
+import org.example.oj.entity.question.Question;
 
 import java.util.List;
 

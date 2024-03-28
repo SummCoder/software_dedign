@@ -1,11 +1,11 @@
-package org.example.reader.strategy.reader;
+package org.example.oj.strategy.reader;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.reader.entity.exam.Exam;
-import org.example.reader.entity.question.Question;
-import org.example.reader.factory.question.*;
-import org.example.reader.factory.util.TypeFactory;
+import org.example.oj.entity.exam.Exam;
+import org.example.oj.entity.question.Question;
+import org.example.oj.factory.question.*;
+import org.example.oj.factory.util.TypeFactory;
 
 import java.io.File;
 import java.io.IOException;

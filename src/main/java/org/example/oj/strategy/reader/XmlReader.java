@@ -1,10 +1,10 @@
-package org.example.reader.strategy.reader;
+package org.example.oj.strategy.reader;
 
-import org.example.reader.entity.exam.Exam;
-import org.example.reader.entity.question.Question;
-import org.example.reader.entity.sample.Sample;
-import org.example.reader.factory.question.QuestionFactory;
-import org.example.reader.factory.util.TypeFactory;
+import org.example.oj.entity.exam.Exam;
+import org.example.oj.entity.question.Question;
+import org.example.oj.entity.sample.Sample;
+import org.example.oj.factory.question.QuestionFactory;
+import org.example.oj.factory.util.TypeFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -76,9 +76,9 @@ public class XmlReader implements FileReader {
                 if (questionElement.getChild("partialScores") != null) {
                     Element options = questionElement.getChild("partialScores");
                     List<Element> childElement = options.getChildren("partialScore");
-                    List<String> optionsList = new ArrayList<>();
+                    List<Integer> optionsList = new ArrayList<>();
                     for (Element child : childElement) {
-                        String option = child.getText();
+                        Integer option = Integer.valueOf(child.getText());
                         optionsList.add(option);
                     }
                     map.put("partialScore", optionsList);

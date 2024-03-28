@@ -1,6 +1,8 @@
-package org.example.reader.entity.question;
+package org.example.oj.entity.question;
 
 import lombok.Data;
+import org.example.oj.entity.answer.Answer;
+import org.example.oj.factory.util.ModeFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -28,5 +30,14 @@ public class MultipleChoiceQuestion extends Question {
         multipleChoiceQuestion.setFixScore((Integer) map.get("fixScore"));
         multipleChoiceQuestion.setPartialScore((List<Integer>) map.get("partialScore"));
         return multipleChoiceQuestion;
+    }
+
+    @Override
+    public int testAnswer(Question question, Answer answer) {
+        MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) question;
+        String scoreMode = multipleChoiceQuestion.getScoreMode();
+        // 利用工厂调用不同策略
+        ModeFactory modeFactory = new ModeFactory(scoreMode);
+        return modeFactory.getScore(multipleChoiceQuestion, answer);
     }
 }

@@ -1,6 +1,6 @@
-package org.example.reader.strategy.reader;
+package org.example.oj.strategy.reader;
 
-import org.example.reader.entity.exam.Exam;
+import org.example.oj.entity.exam.Exam;
 
 /**
  * @author SummCoder

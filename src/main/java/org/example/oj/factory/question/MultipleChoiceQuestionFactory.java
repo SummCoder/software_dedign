@@ -1,9 +1,7 @@
-package org.example.reader.factory.question;
+package org.example.oj.factory.question;
 
-import org.example.reader.entity.question.MultipleChoiceQuestion;
-import org.example.reader.entity.question.Question;
-
-import java.util.Map;
+import org.example.oj.entity.question.MultipleChoiceQuestion;
+import org.example.oj.entity.question.Question;
 
 /**
  * @author SummCoder

@@ -1,9 +1,9 @@
-package org.example.reader.factory.util;
+package org.example.oj.factory.util;
 
-import org.example.reader.factory.question.MultipleChoiceQuestionFactory;
-import org.example.reader.factory.question.ProgrammingQuestionFactory;
-import org.example.reader.factory.question.QuestionFactory;
-import org.example.reader.factory.question.SingleChoiceQuestionFactory;
+import org.example.oj.factory.question.MultipleChoiceQuestionFactory;
+import org.example.oj.factory.question.ProgrammingQuestionFactory;
+import org.example.oj.factory.question.QuestionFactory;
+import org.example.oj.factory.question.SingleChoiceQuestionFactory;
 
 /**
  * @author SummCoder

@@ -1,4 +1,4 @@
-package org.example.reader.entity.sample;
+package org.example.oj.entity.sample;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

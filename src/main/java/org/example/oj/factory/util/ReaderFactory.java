@@ -1,12 +1,12 @@
-package org.example.reader;
+package org.example.oj.factory.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.reader.entity.exam.Exam;
-import org.example.reader.strategy.reader.FileReader;
-import org.example.reader.strategy.reader.JsonReader;
-import org.example.reader.strategy.reader.XmlReader;
+import org.example.oj.entity.exam.Exam;
+import org.example.oj.strategy.reader.FileReader;
+import org.example.oj.strategy.reader.JsonReader;
+import org.example.oj.strategy.reader.XmlReader;
 
 /**
  * @author SummCoder
@@ -17,11 +17,11 @@ import org.example.reader.strategy.reader.XmlReader;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Reader {
+public class ReaderFactory {
     // 读取方法策略类
     private FileReader fileReader;
 
-    public Reader(String type) {
+    public ReaderFactory(String type) {
         // 简单工厂 + 策略模式选择构建Reader策略
         if (type.equals("json")) {
             this.fileReader = new JsonReader();

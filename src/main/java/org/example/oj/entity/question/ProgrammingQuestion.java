@@ -1,7 +1,8 @@
-package org.example.reader.entity.question;
+package org.example.oj.entity.question;
 
 import lombok.Data;
-import org.example.reader.entity.sample.Sample;
+import org.example.oj.entity.answer.Answer;
+import org.example.oj.entity.sample.Sample;
 
 import java.util.List;
 import java.util.Map;
@@ -23,5 +24,10 @@ public class ProgrammingQuestion extends Question{
         programmingQuestion.setSamples((List<Sample>) map.get("samples"));
         programmingQuestion.setTimeLimit((Integer) map.get("timeLimit"));
         return programmingQuestion;
+    }
+
+    @Override
+    public int testAnswer(Question question, Answer answer) {
+        return question.getPoints();
     }
 }

@@ -1,6 +1,7 @@
-package org.example.reader.entity.question;
+package org.example.oj.entity.question;
 
 import lombok.Data;
+import org.example.oj.entity.answer.Answer;
 
 import java.util.Map;
 
@@ -17,4 +18,6 @@ public abstract class Question {
     private String question;
     private Integer points;
     public abstract Question init(Map<String, Object> map, Question question);
+
+    public abstract int testAnswer(Question question, Answer answer);
 }
