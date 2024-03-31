@@ -5,7 +5,7 @@ import org.example.oj.entity.question.MultipleChoiceQuestion;
 
 /**
  * @author SummCoder
- * @desc
+ * @desc 给分策略类接口
  * @date 2024/3/28 12:32
  */
 public interface Score {

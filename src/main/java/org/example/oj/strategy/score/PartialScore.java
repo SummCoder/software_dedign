@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * @author SummCoder
- * @desc
+ * @desc partial给分策略
  * @date 2024/3/28 12:33
  */
 public class PartialScore implements Score{
