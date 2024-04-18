@@ -3,11 +3,12 @@ package org.example;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
-import org.example.oj.factory.util.ReaderFactory;
+import org.example.oj.constant.Constant;
 import org.example.oj.entity.answer.Answer;
 import org.example.oj.entity.answer.Answers;
 import org.example.oj.entity.exam.Exam;
 import org.example.oj.entity.question.Question;
+import org.example.oj.factory.util.ReaderFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,13 +29,19 @@ public class Main {
         String answersPath = casePath + System.getProperty("file.separator") + "answers";
         // 输出文件路径
         String output = args[1];
+        Constant.setExamsPath(examsPath);
+        Constant.setAnswerPath(answersPath);
+        Constant.setOutputPath(output);
         try {
             // TODO:在下面调用你实现的功能
             // 遍历读取所有题目文件夹中的文件
             File examFolder = new File(examsPath);
             File[] files = examFolder.listFiles();
             File answerFolder = new File(answersPath);
-            File[] answerFiles = answerFolder.listFiles();
+            File[] answerFiles = answerFolder.listFiles((dir, name) -> {
+                // 只接受文件，不接受文件夹
+                return new File(dir, name).isFile();
+            });
             assert files != null;
             assert answerFiles != null;
             CSVWriter writer = new CSVWriter(new FileWriter(output), ',', CSVWriter.NO_QUOTE_CHARACTER);
@@ -50,7 +57,6 @@ public class Main {
                 String examPath = file.getAbsolutePath();
                 // 获得试卷
                 Exam exam = reader.getExam(examPath);
-//            System.out.println(exam);
                 // 进行评分
                 for (File answerFile : answerFiles) {
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -65,15 +71,10 @@ public class Main {
                             List<Answer> answerList = answers.getAnswers();
                             for (Question question : questions) {
                                 for (Answer answer : answerList) {
-                                    if (question.getType() == 3) {
-                                        score += question.getPoints();
-                                        break;
-                                    }
                                     if (Objects.equals(question.getId(), answer.getId())) {
                                         int singleScore;
                                         singleScore = question.testAnswer(question, answer);
                                         score += singleScore;
-//                                        System.out.println(score);
                                     }
                                 }
                             }

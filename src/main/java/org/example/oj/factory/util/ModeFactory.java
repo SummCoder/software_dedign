@@ -2,11 +2,10 @@ package org.example.oj.factory.util;
 
 import org.example.oj.entity.answer.Answer;
 import org.example.oj.entity.question.MultipleChoiceQuestion;
-import org.example.oj.entity.question.Question;
-import org.example.oj.strategy.score.FixScore;
-import org.example.oj.strategy.score.NothingScore;
-import org.example.oj.strategy.score.PartialScore;
-import org.example.oj.strategy.score.Score;
+import org.example.oj.strategy.score.multiple.FixScore;
+import org.example.oj.strategy.score.multiple.NothingScore;
+import org.example.oj.strategy.score.multiple.PartialScore;
+import org.example.oj.strategy.score.multiple.Score;
 
 import java.util.Objects;
 
