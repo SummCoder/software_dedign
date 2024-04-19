@@ -10,6 +10,5 @@ import org.example.oj.entity.question.ProgrammingQuestion;
 public interface Score {
     Integer compileCode(String outputPath, String sourcePath);
     Integer executeCode(String classFilePath, ProgrammingQuestion question, String outputFilePath);
-
     Integer score(ProgrammingQuestion programmingQuestion, String outputFilePath);
 }

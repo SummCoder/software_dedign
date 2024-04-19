@@ -1,4 +1,4 @@
-package org.example.oj.strategy.score.program;
+package org.example.oj.strategy.score.program.impl;
 
 import org.example.oj.constant.Constant;
 import org.example.oj.entity.sample.Sample;

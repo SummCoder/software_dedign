@@ -2,6 +2,8 @@ package org.example.oj.strategy.score.program;
 
 import org.example.oj.entity.question.ProgrammingQuestion;
 import org.example.oj.entity.sample.Sample;
+import org.example.oj.strategy.score.program.impl.CompileTaskImpl;
+import org.example.oj.strategy.score.program.impl.ExecuteTaskImpl;
 import org.example.oj.thread.ThreadPool;
 
 import java.io.BufferedReader;
@@ -18,16 +20,17 @@ import java.util.concurrent.Future;
  * @date 2024/4/17 23:18
  */
 public class JavaScore implements Score {
+    ThreadPool threadPool = new ThreadPool();
+
     @Override
     public Integer compileCode(String outputPath, String sourcePath) {
+        Future<Integer> future = threadPool.submit(new CompileTaskImpl(outputPath, sourcePath));
         try {
-            // 调用命令行命令编译Java代码
-            Process process = Runtime.getRuntime().exec("javac -d " + outputPath + " " + sourcePath);
-            return process.waitFor();
-        } catch (IOException | InterruptedException e) {
+            return future.get();
+        }catch (Exception e) {
             e.printStackTrace();
-            return -1;
         }
+        return 0;
     }
 
     @Override
@@ -52,7 +55,6 @@ public class JavaScore implements Score {
                 System.out.println("An error occurred while creating the file: " + e.getMessage());
             }
         }
-        ThreadPool threadPool = new ThreadPool();
         List<Future<Integer>> futures = new ArrayList<>();
 
         for (Sample sample : samples) {
