@@ -9,6 +9,7 @@ import org.example.oj.entity.answer.Answers;
 import org.example.oj.entity.exam.Exam;
 import org.example.oj.entity.question.Question;
 import org.example.oj.factory.util.ReaderFactory;
+import org.example.oj.thread.ThreadPool;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -47,6 +48,7 @@ public class Main {
             CSVWriter writer = new CSVWriter(new FileWriter(output), ',', CSVWriter.NO_QUOTE_CHARACTER);
             String[] header = {"examId", "stuId", "score"};
             writer.writeNext(header);
+            ThreadPool threadPool = new ThreadPool();
             // 变化的量：文件的类型
             for (File file : files) {
                 // 获取文件拓展名，例如json、xml

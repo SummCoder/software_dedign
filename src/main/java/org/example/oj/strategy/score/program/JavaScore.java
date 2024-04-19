@@ -1,13 +1,16 @@
 package org.example.oj.strategy.score.program;
 
-import org.example.oj.constant.Constant;
 import org.example.oj.entity.question.ProgrammingQuestion;
 import org.example.oj.entity.sample.Sample;
+import org.example.oj.thread.ThreadPool;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * @author SummCoder
@@ -29,60 +32,43 @@ public class JavaScore implements Score {
 
     @Override
     public Integer executeCode(String classFilePath, ProgrammingQuestion question, String outputFilePath) {
-        try {
-            List<Sample> samples = question.getSamples();
-            File file = new File(outputFilePath);
-            File parentDir = file.getParentFile();
+        List<Sample> samples = question.getSamples();
+        File file = new File(outputFilePath);
+        File parentDir = file.getParentFile();
 
-            if (parentDir != null && !parentDir.exists()) {
-                if (parentDir.mkdirs()) {
-                    System.out.println("Parent directories created successfully.");
-                } else {
-                    System.out.println("Failed to create parent directories.");
-                }
+        if (parentDir != null && !parentDir.exists()) {
+            if (parentDir.mkdirs()) {
+                System.out.println("Parent directories created successfully.");
+            } else {
+                System.out.println("Failed to create parent directories.");
             }
-            if (file.exists()) {
-                file.delete();
-                try {
-                    file.createNewFile();
-                    System.out.println("File created successfully.");
-                } catch (IOException e) {
-                    System.out.println("An error occurred while creating the file: " + e.getMessage());
-                }
+        }
+        if (file.exists()) {
+            file.delete();
+            try {
+                file.createNewFile();
+                System.out.println("File created successfully.");
+            } catch (IOException e) {
+                System.out.println("An error occurred while creating the file: " + e.getMessage());
             }
-            for (Sample sample : samples) {
-                // 执行程序并将输出重定向到文件
-                String[] inputArgs = sample.getInput().split(" ");
-                List<String> commandList = new ArrayList<>();
-                commandList.add("java");
-                commandList.add("-cp");
-                commandList.add(Constant.getAnswerPath() + System.getProperty("file.separator") + "output");
-                commandList.add(classFilePath);
-                commandList.addAll(Arrays.asList(inputArgs));
+        }
+        ThreadPool threadPool = new ThreadPool();
+        List<Future<Integer>> futures = new ArrayList<>();
 
-                ProcessBuilder processBuilder = new ProcessBuilder(commandList);
-                processBuilder.redirectOutput((ProcessBuilder.Redirect.appendTo(file)));
-                Process process = processBuilder.start();
-                int exitCode = process.waitFor();
-                if (exitCode != 0) {
-                    // 运行出错，返回0分
-                    // 获取错误输出流
-                    InputStream errorStream = process.getErrorStream();
-                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
-                    String errorLine;
-                    StringBuilder errorOutput = new StringBuilder();
-                    // 读取错误输出
-                    while ((errorLine = errorReader.readLine()) != null) {
-                        errorOutput.append(errorLine).append("\n");
-                    }
-                    // 输出错误信息
-                    System.out.println("命令行运行报错信息：" + errorOutput);
+        for (Sample sample : samples) {
+            Future<Integer> future = threadPool.submit(new ExecuteTaskImpl(classFilePath, sample, outputFilePath));
+            futures.add(future);
+        }
+
+        for (Future<Integer> integerFuture : futures) {
+            try {
+                Integer result = integerFuture.get();
+                if (result == 0) {
                     return 0;
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            return 0;
         }
         return 1;
     }
@@ -101,11 +87,17 @@ public class JavaScore implements Score {
             // 处理文件读取异常
             e.printStackTrace();
         }
-        for (int i = 0; i < samples.size(); i++) {
-            if (!samples.get(i).getOutput().equals(fileLines.get(i))) {
-                return 0;
+        int cnt = 0;
+        for (Sample sample : samples) {
+            for (String fileLine : fileLines) {
+                if (sample.getOutput().equals(fileLine)) {
+                    cnt++;
+                }
             }
         }
-        return question.getPoints();
+        if (cnt == samples.size()) {
+            return question.getPoints();
+        }
+        return 0;
     }
 }
