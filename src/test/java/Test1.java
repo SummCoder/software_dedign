@@ -30,5 +30,17 @@ public class Test1 {
         Main.main(args);
         TestUtils.compareCSV(expected, realOutput);
     }
+
+    @Test
+    public void testComplexity() {
+        String realOutput = resourcePath + System.getProperty("file.separator") + "output_complexity.csv";
+        String expected = resourcePath + System.getProperty("file.separator") + "output" + System.getProperty("file.separator") + "complexity.csv";
+        String[] args = new String[]{
+                resourcePath,
+                realOutput
+        };
+        Main.main(args);
+        TestUtils.compareCSV(expected, realOutput);
+    }
 }
 
