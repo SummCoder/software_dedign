@@ -23,9 +23,110 @@
 - 客户端调用尽量持有抽象类而非具体实现类
 - 最小接口以及单一职责，每一个类尽量只有一个功能对外提供。
 
+因此，该OJ系统是高内聚。低耦合的，我们可以说拓展新功能以及修改功能也会变得十分方便，且影响较小。
 
+## 迭代三功能设计
 
+### 时间限制
 
+```java
+// 等待执行线程
+boolean completedWithinTime = process.waitFor(timeLimit, java.util.concurrent.TimeUnit.MILLISECONDS);
 
+if (!completedWithinTime) {
+    // 超出时间限制，返回0分
+    process.destroy(); // 终止进程
+    // 输出超时信息
+    System.out.println("TimeOut!");
+    return 0;
+}
+```
 
+超时则终止运行进程并使得线程返回。
 
+### 圈复杂度
+
+考虑到不同编程语言圈复杂度的计算是会有所区别的，我们复用先前的JavaScore，为Score接口加上calculateCyclomaticComplexity方法，在具体实现类中针对不同编程语言进行具体实现。将相关的变化内聚起来。
+
+```java
+public Integer calculateCyclomaticComplexity(String code) {
+    CompilationUnit cu = StaticJavaParser.parse(code);
+    int classComplexity = 0;
+
+    for (MethodDeclaration method : cu.findAll(MethodDeclaration.class)) {
+        int methodComplexity = calculateMethodComplexity(method);
+        classComplexity += methodComplexity;
+    }
+
+    return classComplexity;
+}
+
+private int calculateMethodComplexity(MethodDeclaration method) {
+    int complexity = 1;
+
+    for (IfStmt ignored : method.findAll(IfStmt.class)) {
+        complexity++; // 每个 if 语句增加 1
+    }
+
+    for (WhileStmt ignored : method.findAll(WhileStmt.class)) {
+        complexity++; // 每个 while 循环增加 1
+    }
+
+    for (DoStmt ignored : method.findAll(DoStmt.class)) {
+        complexity++; // 每个 do-while 循环增加 1
+    }
+
+    for (ForStmt ignored : method.findAll(ForStmt.class)) {
+        complexity++; // 每个 for 循环增加 1
+    }
+
+    for (ConditionalExpr ignored : method.findAll(ConditionalExpr.class)) {
+        complexity++;
+    }
+
+    for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
+        BinaryExpr.Operator operator = binaryExpr.asBinaryExpr().getOperator();
+        if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
+            complexity++; // 布尔运算符作为判定节点，增加 1
+        }
+    }
+
+    return complexity;
+}
+```
+
+由于直接采用节点判定法，我们直接采用上述一段简单的代码，查找所有符合的节点即可。
+
+当然，简化一下如下写就行：
+```java
+complexity += method.findAll(IfStmt.class).size() + method.findAll(WhileStmt.class).size() + method.findAll(DoStmt.class).size() + method.findAll(ForStmt.class).size() + method.findAll(ConditionalExpr.class).size();
+
+for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
+    BinaryExpr.Operator operator = binaryExpr.asBinaryExpr().getOperator();
+    if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
+        complexity++; // 布尔运算符作为判定节点，增加 1
+    }
+}
+```
+
+## 三次迭代的变化
+
+![image.png](https://s2.loli.net/2024/05/11/OLrSsZvxADoQ5Jp.png)
+
+![image.png](https://s2.loli.net/2024/05/11/WYXfsg7wr3aIU89.png)
+
+![image.png](https://s2.loli.net/2024/05/11/6OwnSghjoPKuJGp.png)
+
+可以看出，随着不断进行迭代，系统的复杂度以及组件不断增加，采用好的设计原则可以使得我们不改变原有函数以及类的情况下，进行系统的扩展和维护。
+
+## 关于前两次迭代的反思
+
+前一次需要实现线程池用以加速，当时的想法就是将一道题目的所有输出全部重定向到一个文件之中去。当时就被一个问题困扰许久，也就是多线程重定向先后的问题。
+
+由于上次的测试用例较为宽容，这个问题虽然纠结许久，但是最后采用了一个十分不合理的方式通过了测试，即遍历重定向后的文件内容，只要有与答案文件相同的输出且数量等于测试用例数量即判定为通过测试。
+
+但这次测试用例中出现一道题目测试样例中有相同的答案，此方法便行不通了。
+
+最后思考出来的解决方案：将每个测试用例输出重定向到不同文件，如此也不需要考虑写入先后的问题，读取相对应文件内容即可。
+
+反思：很多在某些阶段看起来能解决问题（就比如这里通过测试）的设计，在很多时候，往往是灾难性的，会给未来的维护以及出现的未曾想过的情况造成许许多多的困扰。

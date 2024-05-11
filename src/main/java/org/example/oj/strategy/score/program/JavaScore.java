@@ -141,25 +141,7 @@ public class JavaScore implements Score {
     private int calculateMethodComplexity(MethodDeclaration method) {
         int complexity = 1;
 
-        for (IfStmt ignored : method.findAll(IfStmt.class)) {
-            complexity++; // 每个 if 语句增加 1
-        }
-
-        for (WhileStmt ignored : method.findAll(WhileStmt.class)) {
-            complexity++; // 每个 while 循环增加 1
-        }
-
-        for (DoStmt ignored : method.findAll(DoStmt.class)) {
-            complexity++; // 每个 do-while 循环增加 1
-        }
-
-        for (ForStmt ignored : method.findAll(ForStmt.class)) {
-            complexity++; // 每个 for 循环增加 1
-        }
-
-        for (ConditionalExpr ignored : method.findAll(ConditionalExpr.class)) {
-            complexity++;
-        }
+        complexity += method.findAll(IfStmt.class).size() + method.findAll(WhileStmt.class).size() + method.findAll(DoStmt.class).size() + method.findAll(ForStmt.class).size() + method.findAll(ConditionalExpr.class).size();
 
         for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
             BinaryExpr.Operator operator = binaryExpr.asBinaryExpr().getOperator();
@@ -167,6 +149,34 @@ public class JavaScore implements Score {
                 complexity++; // 布尔运算符作为判定节点，增加 1
             }
         }
+
+
+//        for (IfStmt ignored : method.findAll(IfStmt.class)) {
+//            complexity++; // 每个 if 语句增加 1
+//        }
+//
+//        for (WhileStmt ignored : method.findAll(WhileStmt.class)) {
+//            complexity++; // 每个 while 循环增加 1
+//        }
+//
+//        for (DoStmt ignored : method.findAll(DoStmt.class)) {
+//            complexity++; // 每个 do-while 循环增加 1
+//        }
+//
+//        for (ForStmt ignored : method.findAll(ForStmt.class)) {
+//            complexity++; // 每个 for 循环增加 1
+//        }
+//
+//        for (ConditionalExpr ignored : method.findAll(ConditionalExpr.class)) {
+//            complexity++;
+//        }
+//
+//        for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
+//            BinaryExpr.Operator operator = binaryExpr.asBinaryExpr().getOperator();
+//            if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
+//                complexity++; // 布尔运算符作为判定节点，增加 1
+//            }
+//        }
 
         return complexity;
     }
