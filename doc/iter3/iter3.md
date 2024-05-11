@@ -109,7 +109,7 @@ for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
 }
 ```
 
-为了以相对统一的方式实现单个函数和整个类的圈复杂度实现，我们规定他们的输入都为String，return都为计算得到的圈复杂度。
+~~为了以相对统一的方式实现单个函数和整个类的圈复杂度实现，我们规定他们的输入都为String，return都为计算得到的圈复杂度。~~
 
 #### 设计调整
 
@@ -217,13 +217,16 @@ public Integer calculateCyclomaticComplexity(String code) {
 
 采用上面的设计，进行递归调用即可。当然这里只有一个类，不必如此。
 
+更改后的设计类图：
+![image.png](https://s2.loli.net/2024/05/12/KEHfyszLx1Bd8A2.png)
+
 ## 三次迭代的变化
 
 ![image.png](https://s2.loli.net/2024/05/11/OLrSsZvxADoQ5Jp.png)
 
 ![image.png](https://s2.loli.net/2024/05/11/WYXfsg7wr3aIU89.png)
 
-![image.png](https://s2.loli.net/2024/05/11/6OwnSghjoPKuJGp.png)
+![image.png](https://s2.loli.net/2024/05/12/KEHfyszLx1Bd8A2.png)
 
 可以看出，随着不断进行迭代，系统的复杂度以及组件不断增加，采用好的设计原则可以使得我们不改变原有函数以及类的情况下，进行系统的扩展和维护。
 
