@@ -6,6 +6,9 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.stmt.*;
+import org.example.oj.composite.AbstractElement;
+import org.example.oj.composite.ClassElement;
+import org.example.oj.composite.MethodElement;
 import org.example.oj.entity.question.ProgrammingQuestion;
 import org.example.oj.entity.sample.Sample;
 import org.example.oj.strategy.score.program.impl.CompileTaskImpl;
@@ -105,32 +108,13 @@ public class JavaScore implements Score {
 
     @Override
     public Integer calculateCyclomaticComplexity(String code) {
+        AbstractElement classElement = new ClassElement();
         CompilationUnit cu = StaticJavaParser.parse(code);
-        int classComplexity = 0;
-
         for (MethodDeclaration method : cu.findAll(MethodDeclaration.class)) {
-            int methodComplexity = calculateMethodComplexity(method.toString());
-            classComplexity += methodComplexity;
+            MethodElement methodElement = new MethodElement(method.toString());
+            classElement.add(methodElement);
         }
-
-        return classComplexity;
+        return classElement.calculateCyclomaticComplexity();
     }
-
-    private int calculateMethodComplexity(String methodCode) {
-        MethodDeclaration method = StaticJavaParser.parseMethodDeclaration(methodCode);
-        int complexity = 1;
-
-        complexity += method.findAll(IfStmt.class).size() + method.findAll(WhileStmt.class).size() + method.findAll(DoStmt.class).size() + method.findAll(ForStmt.class).size() + method.findAll(ConditionalExpr.class).size();
-
-        for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
-            BinaryExpr.Operator operator = binaryExpr.getOperator();
-            if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
-                complexity++; // Boolean operators as decision points, add 1
-            }
-        }
-
-        return complexity;
-    }
-
 
 }

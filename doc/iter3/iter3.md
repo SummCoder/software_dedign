@@ -109,6 +109,114 @@ for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
 }
 ```
 
+为了以相对统一的方式实现单个函数和整个类的圈复杂度实现，我们规定他们的输入都为String，return都为计算得到的圈复杂度。
+
+#### 设计调整
+
+在笔者依据设计文档设计完成后重新审视该设计时，发觉这里其实与课堂所讲树形结构是极其相似的，类中有函数，类中也可以有其他的类，当然这里测试极其简单，只有单一的类。
+
+如此，应该可以使用组合模型对于上述的实现进行优化？加之需求要求相对一致地对待单个函数和整个类，不就更加符合组合模式的适用情形？
+
+进行设计的修改
+
+抽象元素：
+```java
+public abstract class AbstractElement {
+    public abstract Integer calculateCyclomaticComplexity();
+    public abstract void add(AbstractElement element);
+    public abstract void remove(AbstractElement element);
+    public abstract AbstractElement getChild(int i);
+}
+```
+
+类元素：
+```java
+public class ClassElement extends AbstractElement{
+
+    private ArrayList<AbstractElement> children = new ArrayList<>();
+
+    @Override
+    public Integer calculateCyclomaticComplexity() {
+        int complexity = 0;
+        for (AbstractElement obj : children) {
+            complexity += obj.calculateCyclomaticComplexity();
+        }
+        return complexity;
+    }
+
+    @Override
+    public void add(AbstractElement element) {
+        children.add(element);
+    }
+
+    @Override
+    public void remove(AbstractElement element) {
+        children.remove(element);
+    }
+
+    @Override
+    public AbstractElement getChild(int i) {
+        return children.get(i);
+    }
+}
+```
+
+方法元素：
+```java
+public class MethodElement extends AbstractElement{
+
+    private String code;
+
+    public MethodElement(String code) {
+        this.code = code;
+    }
+
+    @Override
+    public Integer calculateCyclomaticComplexity() {
+        MethodDeclaration method = StaticJavaParser.parseMethodDeclaration(code);
+        int complexity = 1;
+        complexity += method.findAll(IfStmt.class).size() + method.findAll(WhileStmt.class).size() + method.findAll(DoStmt.class).size() + method.findAll(ForStmt.class).size() + method.findAll(ConditionalExpr.class).size();
+        for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
+            BinaryExpr.Operator operator = binaryExpr.getOperator();
+            if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
+                complexity++; // Boolean operators as decision points, add 1
+            }
+        }
+        return complexity;
+    }
+
+    @Override
+    public void add(AbstractElement element) {
+
+    }
+
+    @Override
+    public void remove(AbstractElement element) {
+
+    }
+
+    @Override
+    public AbstractElement getChild(int i) {
+        return null;
+    }
+}
+```
+
+客户端调用：
+```java
+public Integer calculateCyclomaticComplexity(String code) {
+    AbstractElement classElement = new ClassElement();
+    CompilationUnit cu = StaticJavaParser.parse(code);
+    for (MethodDeclaration method : cu.findAll(MethodDeclaration.class)) {
+        MethodElement methodElement = new MethodElement(method.toString());
+        classElement.add(methodElement);
+    }
+    return classElement.calculateCyclomaticComplexity();
+}
+```
+
+采用上面的设计，进行递归调用即可。当然这里只有一个类，不必如此。
+
 ## 三次迭代的变化
 
 ![image.png](https://s2.loli.net/2024/05/11/OLrSsZvxADoQ5Jp.png)
