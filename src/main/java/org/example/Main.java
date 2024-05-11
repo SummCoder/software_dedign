@@ -7,9 +7,9 @@ import org.example.oj.constant.Constant;
 import org.example.oj.entity.answer.Answer;
 import org.example.oj.entity.answer.Answers;
 import org.example.oj.entity.exam.Exam;
+import org.example.oj.entity.question.ProgrammingQuestion;
 import org.example.oj.entity.question.Question;
 import org.example.oj.factory.util.ReaderFactory;
-import org.example.oj.thread.ThreadPool;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -46,9 +46,14 @@ public class Main {
             assert files != null;
             assert answerFiles != null;
             CSVWriter writer = new CSVWriter(new FileWriter(output), ',', CSVWriter.NO_QUOTE_CHARACTER);
-            String[] header = {"examId", "stuId", "score"};
+            String[] header;
+
+            if (output.endsWith("output_complexity.csv")) {
+                header = new String[]{"examId", "stuId", "qId", "complexity"};
+            }else {
+                header = new String[]{"examId", "stuId", "score"};
+            }
             writer.writeNext(header);
-            ThreadPool threadPool = new ThreadPool();
             // 变化的量：文件的类型
             for (File file : files) {
                 // 获取文件拓展名，例如json、xml
@@ -64,26 +69,46 @@ public class Main {
                     ObjectMapper objectMapper = new ObjectMapper();
                     JsonNode jsonNode = objectMapper.readTree(answerFile);
                     Answers answers = objectMapper.treeToValue(jsonNode, Answers.class);
-                    if (Objects.equals(answers.getExamId(), exam.getId())) {
-                        int score = 0;
-                        // 早交或者迟交
-                        if (answers.getSubmitTime() < exam.getStartTime() || answers.getSubmitTime() > exam.getEndTime()) { }
-                        else {
+                    if (output.endsWith("output_complexity.csv")){
+                        if (Objects.equals(answers.getExamId(), exam.getId())) {
                             List<Question> questions = exam.getQuestions();
                             List<Answer> answerList = answers.getAnswers();
                             for (Question question : questions) {
                                 for (Answer answer : answerList) {
-                                    if (Objects.equals(question.getId(), answer.getId())) {
-                                        int singleScore;
-                                        singleScore = question.testAnswer(question, answer);
-                                        score += singleScore;
+                                    if (question.getType() == 3 && Objects.equals(question.getId(), answer.getId())) {
+//                                        if (answers.getExamId() == 4 && answers.getStuId() == 3) {
+                                            int complexity;
+                                            complexity = ((ProgrammingQuestion)question).calculateCyclomaticComplexity(answer);
+                                            String[] record = {String.valueOf(answers.getExamId()), String.valueOf(answers.getStuId()), String.valueOf(question.getId()), String.valueOf(complexity)};
+                                            writer.writeNext(record);
+//                                        }
                                     }
                                 }
                             }
                         }
-                        String[] record = {String.valueOf(answers.getExamId()), String.valueOf(answers.getStuId()), String.valueOf(score)};
-                        writer.writeNext(record);
+                    }else {
+                        if (Objects.equals(answers.getExamId(), exam.getId())) {
+                            int score = 0;
+                            // 早交或者迟交
+                            if (answers.getSubmitTime() < exam.getStartTime() || answers.getSubmitTime() > exam.getEndTime()) { }
+                            else {
+                                List<Question> questions = exam.getQuestions();
+                                List<Answer> answerList = answers.getAnswers();
+                                for (Question question : questions) {
+                                    for (Answer answer : answerList) {
+                                        if (Objects.equals(question.getId(), answer.getId())) {
+                                            int singleScore;
+                                            singleScore = question.testAnswer(question, answer);
+                                            score += singleScore;
+                                        }
+                                    }
+                                }
+                            }
+                            String[] record = {String.valueOf(answers.getExamId()), String.valueOf(answers.getStuId()), String.valueOf(score)};
+                            writer.writeNext(record);
+                        }
                     }
+
                 }
             }
             writer.close();

@@ -1,11 +1,9 @@
 package org.example.oj.entity.question;
 
 import lombok.Data;
-import org.example.oj.constant.Constant;
 import org.example.oj.entity.answer.Answer;
 import org.example.oj.entity.sample.Sample;
 import org.example.oj.factory.util.CodeFactory;
-import org.example.oj.strategy.score.program.Score;
 
 import java.util.List;
 import java.util.Map;
@@ -33,5 +31,10 @@ public class ProgrammingQuestion extends Question{
     public int testAnswer(Question question, Answer answer) {
         CodeFactory codeFactory = new CodeFactory("java");
         return codeFactory.getScore((ProgrammingQuestion) question, answer);
+    }
+
+    public int calculateCyclomaticComplexity(Answer answer) {
+        CodeFactory codeFactory = new CodeFactory("java");
+        return codeFactory.getComplexity(answer);
     }
 }

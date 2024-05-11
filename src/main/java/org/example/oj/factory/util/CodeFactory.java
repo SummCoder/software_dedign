@@ -1,11 +1,16 @@
 package org.example.oj.factory.util;
 
+import com.opencsv.CSVWriter;
 import org.example.oj.constant.Constant;
 import org.example.oj.entity.answer.Answer;
 import org.example.oj.entity.question.ProgrammingQuestion;
 import org.example.oj.strategy.score.program.JavaScore;
 import org.example.oj.strategy.score.program.Score;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 /**
@@ -25,8 +30,7 @@ public class CodeFactory {
         String sourcePath = Constant.getAnswerPath() + System.getProperty("file.separator") + answer.getAnswer();
         String outputPath = Constant.getAnswerPath() + System.getProperty("file.separator") + "output";
         String fileName = answer.getAnswer().replace("code-answers/", "").replace(".java", "");
-        String resultPath = Constant.getAnswerPath() + System.getProperty("file.separator") + "result" + System.getProperty("file.separator") + fileName + ".txt";
-//        System.out.println(fileName);
+        String resultPath = Constant.getAnswerPath() + System.getProperty("file.separator") + "result" + System.getProperty("file.separator") + fileName;
         int compileResult = score.compileCode(outputPath, sourcePath);
         if (compileResult == 0) {
             int executeResult = score.executeCode(fileName, question, resultPath);
@@ -34,6 +38,22 @@ public class CodeFactory {
                 return score.score(question, resultPath);
             }
         }
+
         return 0;
+    }
+
+    public int getComplexity(Answer answer) {
+        String sourcePath = Constant.getAnswerPath() + System.getProperty("file.separator") + answer.getAnswer();
+        String outputPath = Constant.getAnswerPath() + System.getProperty("file.separator") + "output";
+        int compileResult = score.compileCode(outputPath, sourcePath);
+        if (compileResult == 0) {
+            try {
+                String code = new String(Files.readAllBytes(Paths.get(sourcePath)));
+                return score.calculateCyclomaticComplexity(code);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return -1;
     }
 }
