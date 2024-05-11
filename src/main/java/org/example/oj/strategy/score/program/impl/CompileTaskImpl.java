@@ -19,7 +19,7 @@ public class CompileTaskImpl implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         try {
             // 调用命令行命令编译Java代码
             Process process = Runtime.getRuntime().exec("javac -d " + outputPath + " " + sourcePath);

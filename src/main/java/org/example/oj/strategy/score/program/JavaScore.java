@@ -87,28 +87,6 @@ public class JavaScore implements Score {
     @Override
     public Integer score(ProgrammingQuestion question, String outputFilePath) {
         List<Sample> samples = question.getSamples();
-//        List<String> fileLines = new ArrayList<>();
-//
-//        try (BufferedReader reader = new BufferedReader(new FileReader(outputFilePath))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                fileLines.add(line);
-//            }
-//        } catch (IOException e) {
-//            // 处理文件读取异常
-//            e.printStackTrace();
-//        }
-//        int cnt = 0;
-//        for (Sample sample : samples) {
-//            for (String fileLine : fileLines) {
-//                if (sample.getOutput().equals(fileLine)) {
-//                    cnt++;
-//                }
-//            }
-//        }
-//        if (cnt == samples.size()) {
-//            return question.getPoints();
-//        }
         for (int i = 0; i < samples.size(); i++) {
             try (BufferedReader reader = new BufferedReader(new FileReader(outputFilePath + System.getProperty("file.separator") + i + ".txt"))) {
                 String line;
@@ -131,83 +109,28 @@ public class JavaScore implements Score {
         int classComplexity = 0;
 
         for (MethodDeclaration method : cu.findAll(MethodDeclaration.class)) {
-            int methodComplexity = calculateMethodComplexity(method);
+            int methodComplexity = calculateMethodComplexity(method.toString());
             classComplexity += methodComplexity;
         }
 
         return classComplexity;
     }
 
-    private int calculateMethodComplexity(MethodDeclaration method) {
+    private int calculateMethodComplexity(String methodCode) {
+        MethodDeclaration method = StaticJavaParser.parseMethodDeclaration(methodCode);
         int complexity = 1;
 
         complexity += method.findAll(IfStmt.class).size() + method.findAll(WhileStmt.class).size() + method.findAll(DoStmt.class).size() + method.findAll(ForStmt.class).size() + method.findAll(ConditionalExpr.class).size();
 
         for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
-            BinaryExpr.Operator operator = binaryExpr.asBinaryExpr().getOperator();
+            BinaryExpr.Operator operator = binaryExpr.getOperator();
             if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
-                complexity++; // 布尔运算符作为判定节点，增加 1
+                complexity++; // Boolean operators as decision points, add 1
             }
         }
 
-
-//        for (IfStmt ignored : method.findAll(IfStmt.class)) {
-//            complexity++; // 每个 if 语句增加 1
-//        }
-//
-//        for (WhileStmt ignored : method.findAll(WhileStmt.class)) {
-//            complexity++; // 每个 while 循环增加 1
-//        }
-//
-//        for (DoStmt ignored : method.findAll(DoStmt.class)) {
-//            complexity++; // 每个 do-while 循环增加 1
-//        }
-//
-//        for (ForStmt ignored : method.findAll(ForStmt.class)) {
-//            complexity++; // 每个 for 循环增加 1
-//        }
-//
-//        for (ConditionalExpr ignored : method.findAll(ConditionalExpr.class)) {
-//            complexity++;
-//        }
-//
-//        for (BinaryExpr binaryExpr : method.findAll(BinaryExpr.class)) {
-//            BinaryExpr.Operator operator = binaryExpr.asBinaryExpr().getOperator();
-//            if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
-//                complexity++; // 布尔运算符作为判定节点，增加 1
-//            }
-//        }
-
         return complexity;
     }
-
-//    // 计算给定语句中的判定节点数量
-//    private int countDecisionNodes(Statement stmt) {
-//        int decisionNodes = 0;
-//
-//        if (stmt instanceof IfStmt) {
-//            decisionNodes++;
-//            IfStmt ifStmt = (IfStmt) stmt;
-//            decisionNodes += countDecisionNodes(ifStmt.getThenStmt());
-//            if (ifStmt.getElseStmt().isPresent()) {
-//                decisionNodes += countDecisionNodes(ifStmt.getElseStmt().get());
-//            }
-//        } else if (stmt instanceof WhileStmt || stmt instanceof DoStmt || stmt instanceof ForStmt) {
-//            decisionNodes++;
-//        } else if (stmt instanceof ExpressionStmt) {
-//            ExpressionStmt exprStmt = (ExpressionStmt) stmt;
-//            if (hasDecisionNode(exprStmt.getExpression())) {
-//                decisionNodes++;
-//            }
-//        }
-//
-//        return decisionNodes;
-//    }
-//
-//    // 判断给定表达式是否包含判定节点
-//    private boolean hasDecisionNode(Expression expr) {
-//        return expr.isBinaryExpr() || expr.isConditionalExpr();
-//    }
 
 
 }

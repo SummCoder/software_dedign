@@ -1,13 +1,11 @@
 package org.example.oj.factory.util;
 
-import com.opencsv.CSVWriter;
 import org.example.oj.constant.Constant;
 import org.example.oj.entity.answer.Answer;
 import org.example.oj.entity.question.ProgrammingQuestion;
 import org.example.oj.strategy.score.program.JavaScore;
 import org.example.oj.strategy.score.program.Score;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
